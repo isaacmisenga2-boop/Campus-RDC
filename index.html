@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#123b73">
+  <meta name="description" content="CAMPUS RDC — l'espace numérique des étudiants de la République démocratique du Congo.">
+  <title>CAMPUS RDC | Espace étudiant</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="CAMPUS RDC accueil">
+      <span class="brand-mark">C</span>
+      <span>CAMPUS <strong>RDC</strong></span>
+    </a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu" aria-expanded="false">☰</button>
+    <nav class="main-nav" id="mainNav">
+      <button class="nav-link active" data-view="accueil">Accueil</button>
+      <button class="nav-link" data-view="cours">Cours</button>
+      <button class="nav-link" data-view="agenda">Agenda</button>
+      <button class="nav-link" data-view="annonces">Annonces</button>
+      <button class="nav-link" data-view="profil">Mon profil</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="welcome-panel">
+      <div>
+        <p class="eyebrow">TON CAMPUS, PARTOUT EN RDC</p>
+        <h1>Bienvenue sur <span>CAMPUS RDC</span></h1>
+        <p class="welcome-copy">Un seul espace pour retrouver tes cours, suivre l'actualité académique et organiser ta vie estudiantine.</p>
+        <button class="primary-btn" data-go="cours">Explorer les cours <span>→</span></button>
+      </div>
+      <div class="welcome-art" aria-hidden="true">
+        <div class="art-circle"></div>
+        <div class="art-book">📚</div>
+        <div class="art-cap">🎓</div>
+      </div>
+    </section>
+
+    <section class="quick-stats" aria-label="Aperçu">
+      <article class="stat-card"><span class="stat-icon">🏛️</span><div><strong id="universityCount">0</strong><small>Universités pilotes</small></div></article>
+      <article class="stat-card"><span class="stat-icon">📘</span><div><strong id="courseCount">0</strong><small>Ressources de cours</small></div></article>
+      <article class="stat-card"><span class="stat-icon">📢</span><div><strong id="announcementCount">0</strong><small>Annonces récentes</small></div></article>
+    </section>
+
+    <section class="content-section" id="homeSection">
+      <div class="section-heading">
+        <div><p class="eyebrow">À NE PAS MANQUER</p><h2>Actualités du campus</h2></div>
+        <button class="text-btn" data-go="annonces">Tout voir →</button>
+      </div>
+      <div class="announcement-grid" id="homeAnnouncements"></div>
+    </section>
+
+    <section class="content-section" id="coursesSection">
+      <div class="section-heading">
+        <div><p class="eyebrow">APPRENDRE ET PROGRESSER</p><h2>Bibliothèque de cours</h2></div>
+        <button class="text-btn" data-go="cours">Voir les cours →</button>
+      </div>
+      <div class="course-grid" id="homeCourses"></div>
+    </section>
+
+    <section class="view-section hidden" id="view-cours">
+      <div class="section-heading"><div><p class="eyebrow">TA BIBLIOTHÈQUE</p><h2>Explorer les cours</h2></div></div>
+      <div class="filters">
+        <label class="search-box"><span>⌕</span><input id="courseSearch" type="search" placeholder="Rechercher un cours, une matière..."></label>
+        <select id="universityFilter" aria-label="Filtrer par université"><option value="Toutes">Toutes les universités</option></select>
+      </div>
+      <div class="course-grid" id="allCourses"></div>
+      <p class="empty-state hidden" id="courseEmpty">Aucun cours ne correspond à ta recherche.</p>
+    </section>
+
+    <section class="view-section hidden" id="view-agenda">
+      <div class="section-heading"><div><p class="eyebrow">RESTE ORGANISÉ</p><h2>Agenda académique</h2></div></div>
+      <div class="agenda-card">
+        <div class="agenda-date"><strong>À VENIR</strong><span>📅</span></div>
+        <div class="agenda-item"><span class="date-chip">À définir</span><div><strong>Rentrée et calendrier académique</strong><p>Consulte les communications officielles de ton établissement.</p></div></div>
+        <div class="agenda-item"><span class="date-chip">À définir</span><div><strong>Période des examens</strong><p>Les dates seront ajoutées après confirmation par les universités.</p></div></div>
+        <p class="note">Les dates affichées ici sont des espaces de démonstration. Vérifie toujours les informations auprès de ton établissement.</p>
+      </div>
+    </section>
+
+    <section class="view-section hidden" id="view-annonces">
+      <div class="section-heading"><div><p class="eyebrow">INFORMATIONS</p><h2>Annonces étudiantes</h2></div></div>
+      <div class="announcement-grid" id="allAnnouncements"></div>
+    </section>
+
+    <section class="view-section hidden" id="view-profil">
+      <div class="section-heading"><div><p class="eyebrow">TON ESPACE PERSONNEL</p><h2>Mon profil étudiant</h2></div></div>
+      <form class="profile-card" id="profileForm">
+        <label>Nom complet<input id="studentName" type="text" placeholder="Ex. Isaac Misenga"></label>
+        <label>Université
+          <select id="studentUniversity">
+            <option value="">Choisir mon université</option>
+          </select>
+        </label>
+        <label>Faculté ou domaine<input id="studentFaculty" type="text" placeholder="Ex. Faculté de droit"></label>
+        <label>Promotion / année<input id="studentYear" type="text" placeholder="Ex. Bac 1"></label>
+        <button class="primary-btn" type="submit">Enregistrer mon profil</button>
+        <p class="form-message" id="profileMessage" role="status"></p>
+        <p class="note">Pour cette première maquette, ton profil est enregistré uniquement dans le navigateur de ton appareil.</p>
+      </form>
+    </section>
+
+    <div class="demo-notice"><span>ℹ️</span><p><strong>Version de démonstration :</strong> les cours, annonces et universités affichés sont des exemples. La connexion réelle, les documents téléchargeables et les données officielles seront ajoutés dans les prochaines étapes.</p></div>
+  </main>
+
+  <footer><span class="brand-mark small">C</span><p>© <span id="year"></span> CAMPUS RDC</p><span>Étudier. S'organiser. Réussir.</span></footer>
+</body>
+</html>
