@@ -1,105 +1,121 @@
 
-/* CAMPUS RDC - Application V1.0 */
+/* CAMPUS RDC - V1.0 */
 
 document.addEventListener("DOMContentLoaded", () => {
+
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => [...document.querySelectorAll(selector)];
 
-  // NAVIGATION
-  const navLinks = $$("[data-section], .nav-link, [data-page]");
-  const sections = $$(".app-section, .page-section, section[id]");
+  // 1. NAVIGATION PRINCIPALE
 
-  function showSection(target) {
+  const views = {
+    accueil: "homeSection",
+    cours: "view-cours",
+    agenda: "view-agenda",
+    annonces: "view-annonces",
+    profil: "view-profil"
+  };
+
+  function showView(name) {
+    const target = views[name];
+
     if (!target) return;
 
-    sections.forEach((section) => {
-      section.hidden = section.id !== target;
-      section.classList.toggle("active", section.id === target);
+    // Afficher les sections d'accueil
+    ["homeSection", "coursesSection"].forEach(id => {
+      const section = document.getElementById(id);
+      if (section) {
+        section.hidden = name !== "accueil";
+      }
     });
 
-    navLinks.forEach((link) => {
-      const id = link.dataset.section || link.dataset.page;
-      link.classList.toggle("active", id === target);
+    // Afficher les autres pages
+    Object.entries(views).forEach(([key, id]) => {
+      if (key === "accueil") return;
+
+      const section = document.getElementById(id);
+      if (section) {
+        section.hidden = key !== name;
+      }
     });
+
+    // Mettre à jour les boutons actifs
+    $$(".nav-link[data-view]").forEach(button => {
+      button.classList.toggle(
+        "active",
+        button.dataset.view === name
+      );
+    });
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  navLinks.forEach((link) => {
-    link.addEventListener("click", (event) => {
-      const target = link.dataset.section || link.dataset.page;
-
-      if (target) {
-        event.preventDefault();
-        showSection(target);
-      }
+  // Boutons de navigation
+  $$(".nav-link[data-view]").forEach(button => {
+    button.addEventListener("click", () => {
+      showView(button.dataset.view);
     });
   });
 
-  // RECHERCHE DES COURS
-  const searchInput = $(
-    "#courseSearch, #searchInput, [data-course-search]"
-  );
+  // Boutons "Voir tout", "Voir les cours", etc.
+  $$("[data-go]").forEach(button => {
+    button.addEventListener("click", () => {
+      showView(button.dataset.go);
+    });
+  });
 
-  if (searchInput) {
-    searchInput.addEventListener("input", () => {
-      const term = searchInput.value.trim().toLocaleLowerCase();
+  // 2. MENU MOBILE
 
-      $$(".course-card, [data-course]").forEach((card) => {
-        card.hidden = !card.textContent
-          .toLocaleLowerCase()
-          .includes(term);
-      });
+  const menuButton = $("#menuToggle");
+  const menu = $("#mainNav");
+
+  if (menuButton && menu) {
+    menuButton.addEventListener("click", () => {
+      menu.classList.toggle("open");
+
+      const opened = menu.classList.contains("open");
+      menuButton.setAttribute("aria-expanded", opened);
     });
   }
 
-  // PROFIL ETUDIANT
-  const profileForm = $("#profileForm, [data-profile-form]");
+  // 3. PROFIL ETUDIANT
 
-  const nameInput = $(
-    "#studentName, #profileName, [name='studentName']"
-  );
+  const profileForm = $("#profileForm");
+  const nameInput = $("#studentName");
+  const universityInput = $("#studentUniversity");
+  const facultyInput = $("#studentFaculty");
+  const yearInput = $("#studentYear");
+  const profileMessage = $("#profileMessage");
 
-  const universityInput = $(
-    "#studentUniversity, #university, [name='university']"
-  );
+  // Charger les informations sauvegardées
+  function loadProfile() {
+    try {
+      const profile = JSON.parse(
+        localStorage.getItem("campusRdcProfile") || "{}"
+      );
 
-  const facultyInput = $(
-    "#studentFaculty, #faculty, [name='faculty']"
-  );
+      if (nameInput) nameInput.value = profile.name || "";
+      if (universityInput) universityInput.value = profile.university || "";
+      if (facultyInput) facultyInput.value = profile.faculty || "";
+      if (yearInput) yearInput.value = profile.year || "";
 
-  const profileMessage = $(
-    "#profileMessage, [data-profile-message]"
-  );
-
-  // CHARGER LE PROFIL
-  try {
-    const saved = JSON.parse(
-      localStorage.getItem("campusRdcProfile") || "{}"
-    );
-
-    if (nameInput && saved.name) {
-      nameInput.value = saved.name;
+    } catch (error) {
+      console.log("Profil non disponible.");
     }
-
-    if (universityInput && saved.university) {
-      universityInput.value = saved.university;
-    }
-
-    if (facultyInput && saved.faculty) {
-      facultyInput.value = saved.faculty;
-    }
-  } catch (error) {
-    console.log("Profil non disponible.");
   }
 
-  // ENREGISTRER LE PROFIL
+  loadProfile();
+
+  // Enregistrer le profil
   if (profileForm) {
     profileForm.addEventListener("submit", (event) => {
       event.preventDefault();
 
       const profile = {
         name: nameInput?.value.trim() || "",
-        university: universityInput?.value.trim() || "",
-        faculty: facultyInput?.value.trim() || ""
+        university: universityInput?.value || "",
+        faculty: facultyInput?.value.trim() || "",
+        year: yearInput?.value.trim() || ""
       };
 
       try {
@@ -110,76 +126,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (profileMessage) {
           profileMessage.textContent =
-            "Profil enregistré sur cet appareil.";
-        }
-
-        const displayedName = $(
-          "#displayStudentName, [data-display-name]"
-        );
-
-        if (displayedName) {
-          displayedName.textContent =
-            profile.name || "Étudiant";
+            "Votre profil a été enregistré avec succès !";
         }
 
       } catch (error) {
         if (profileMessage) {
           profileMessage.textContent =
-            "Enregistrement indisponible.";
+            "Impossible d'enregistrer le profil.";
         }
       }
     });
   }
 
-  // AFFICHER LE NOM
-  try {
-    const profile = JSON.parse(
-      localStorage.getItem("campusRdcProfile") || "{}"
-    );
+  // 4. RECHERCHE DES COURS
 
-    const displayedName = $(
-      "#displayStudentName, [data-display-name]"
-    );
+  const searchInput = $("#courseSearch, #searchInput, input[type='search']");
+  const universityFilter = $("#universityFilter");
 
-    if (displayedName && profile.name) {
-      displayedName.textContent = profile.name;
-    }
-  } catch (error) {
-    console.log("Aucun profil enregistré.");
-  }
+  function filterCourses() {
+    const search = searchInput?.value.toLowerCase() || "";
+    const university = universityFilter?.value || "";
 
-  // MENU MOBILE
-  const menuButton = $(
-    "#menuToggle, [data-menu-toggle]"
-  );
+    $$("#allCourses .course-card").forEach(card => {
+      const matchesSearch =
+        card.textContent.toLowerCase().includes(search);
 
-  const menu = $(
-    "#mainNav, .main-nav, [data-main-nav]"
-  );
+      const matchesUniversity =
+        !university ||
+        card.dataset.university === university;
 
-  if (menuButton && menu) {
-    menuButton.addEventListener("click", () => {
-      const expanded =
-        menuButton.getAttribute("aria-expanded") === "true";
-
-      menuButton.setAttribute(
-        "aria-expanded",
-        String(!expanded)
-      );
-
-      menu.classList.toggle("open", !expanded);
+      card.hidden = !(matchesSearch && matchesUniversity);
     });
   }
 
-  // ANNEE AUTOMATIQUE
-  const year = $(
-    "#currentYear, [data-current-year]"
-  );
-
-  if (year) {
-    year.textContent = new Date().getFullYear();
+  if (searchInput) {
+    searchInput.addEventListener("input", filterCourses);
   }
 
-  console.log("CAMPUS RDC est prêt !");
+  if (universityFilter) {
+    universityFilter.addEventListener("change", filterCourses);
+  }
+
+  // 5. ANNEE AUTOMATIQUE
+
+  const currentYear = $("#currentYear");
+
+  if (currentYear) {
+    currentYear.textContent = new Date().getFullYear();
+  }
+
+  console.log("CAMPUS RDC V1.0 est chargé !");
 });
-        
